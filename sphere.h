@@ -1,18 +1,19 @@
 #ifndef SPHERE_H_
 #define SPHERE_H_
 
+#include "generalutilities.h"
 #include "hittable.h"
-#include "vec3.h"
 
 class sphere : public hittable {
     public:
         point3 center;
         double radius;
+        std::shared_ptr<material> mat_ptr;
 
         // Constructors
         sphere() {}
-        sphere(point3 sphere_center, double sphere_radius)
-            : center(sphere_center), radius(sphere_radius) {};
+        sphere(point3 sphere_center, double sphere_radius, std::shared_ptr<material> m)
+            : center(sphere_center), radius(sphere_radius), mat_ptr(m) {};
 
         // Override hit
         virtual bool hit(const ray& r, double t_min, double t_max, hit_record& hit_record) const override;
@@ -47,6 +48,8 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record& hit_recor
     // Calculate the outward normal and set it
     vec3 outward_normal = (hit_record.p - center) / radius;
     hit_record.set_face_normal(r, outward_normal);
+    // Update material pointer in the hit record to point to the sphere material.
+    hit_record.mat_ptr = mat_ptr;
     // Success
     return true;
 }

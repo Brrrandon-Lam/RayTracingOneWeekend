@@ -1,6 +1,7 @@
 #ifndef HITTABLE_LIST_H_
 #define HITTABLE_LIST_H_
 
+#include "generalutilities.h"
 #include "hittable.h"
 #include <memory>
 #include <vector>
@@ -37,5 +38,6 @@ bool hittable_list::hit(const ray &r, double t_min, double t_max, hit_record& hi
     }
     return hit_anything;
 }
+
 
 #endif

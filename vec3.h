@@ -63,6 +63,12 @@ class vec3 {
             return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
         }
 
+        bool near_zero() const {
+            // Returns true if hte vector is close to zero in all directions
+            const auto s = 1e-8;
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < 2);
+        }
+
         // Utilities
 };
 
@@ -125,13 +131,41 @@ inline vec3 unit_vector(vec3 v) {
 vec3 random_in_unit_sphere() {
     while (true) {
         auto p = vec3::random(-1,1);
-        if (p.length_squared() >= 1) continue;
+        if (p.length_squared() >= 1) {
+            continue;
+        }
         return p;
     }
 }
 
 vec3 random_unit_vector() {
     return unit_vector(random_in_unit_sphere());
+}
+
+// Depth of Field - Generate a ray within a disk
+vec3 random_unit_in_disk() {
+    while(true) {
+        // Generate a random point inside of a circle on XY plane w/ radius 1 using rejection method.
+        auto p = vec3(random_double(-1, 1), random_double(-1, 1), 0);
+        if(p.length_squared() >= 1) { 
+            continue; 
+        }
+        return p;
+    }
+}
+
+// Reflection Vector for Metals
+vec3 reflect(const vec3 &v, const vec3 &n) {
+    return v - 2 * dot(v, n) * n;
+}
+
+// Refraction
+vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
+    auto cos_theta = fmin(dot(-uv, n), 1.0);
+    vec3 r_out_perpendicular = etai_over_etat * (uv + cos_theta * n);
+    vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perpendicular.length_squared())) * n;
+    // Calculate the refraction vector by using the dot product to get the parallel and perpendicular components individually.
+    return r_out_perpendicular + r_out_parallel;
 }
 
 #endif
